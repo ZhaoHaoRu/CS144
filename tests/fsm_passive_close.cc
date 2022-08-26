@@ -44,13 +44,22 @@ int main() {
 
             test_2.execute(ExpectState{State::LAST_ACK});
 
+            // TODO: get here!
+            // cout << "passive close get here line 48" << endl;
+
             TCPSegment seg1 = test_2.expect_seg(ExpectOneSegment{}.with_fin(true), "test 2 falied: bad seg or no FIN");
 
             test_2.execute(Tick(cfg.rt_timeout - 2));
 
+            // cout << "passive close get here line 54" << endl;
+
             test_2.execute(ExpectNoSegment{}, "test 2 failed: FIN re-tx was too fast");
 
+            // cout << "passive close get here line 56" << endl;
+
             test_2.execute(Tick(2));
+
+            // cout << "passive close get here line 58" << endl;
 
             TCPSegment seg2 = test_2.expect_seg(ExpectOneSegment{}.with_fin(true).with_seqno(seg1.header().seqno),
                                                 "test 2 failed: bad re-tx FIN");

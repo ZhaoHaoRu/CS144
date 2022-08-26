@@ -6,8 +6,11 @@
 #include <deque>
 #include <list>
 #include <string>
+#include <fstream>
 #include <utility>
+#include <iostream>
 
+using namespace std;
 //! \brief An in-order byte stream.
 
 //! Bytes are written on the "input" side and read from the "output"
@@ -16,7 +19,10 @@
 class ByteStream {
   private:
     // Your code here -- add private members as necessary.
-
+    string buffer;
+    int cap;
+    int begin, end, nowlen;
+    bool _eof;
     bool _error{};  //!< Flag indicating that the stream suffered an error.
 
   public:
@@ -55,7 +61,7 @@ class ByteStream {
     //! \returns a vector of bytes read
     std::string read(const size_t len) {
         const auto ret = peek_output(len);
-        pop_output(len);
+        pop_output(ret.length());
         return ret;
     }
 

@@ -3,14 +3,22 @@
 
 #include "network_interface.hh"
 
+#include <iomanip>
 #include <optional>
 #include <queue>
+#include <list>
 
 //! \brief A wrapper for NetworkInterface that makes the host-side
 //! interface asynchronous: instead of returning received datagrams
 //! immediately (from the `recv_frame` method), it stores them for
 //! later retrieval. Otherwise, behaves identically to the underlying
 //! implementation of NetworkInterface.
+struct RouteEntry {     //! must initialize
+    uint32_t route_prefix = 0;
+    uint8_t prefix_length = 0;
+    std::optional<Address> next_hop{};
+    size_t interface_num = 0;
+};
 class AsyncNetworkInterface : public NetworkInterface {
     std::queue<InternetDatagram> _datagrams_out{};
 
@@ -48,6 +56,11 @@ class Router {
     //! as specified by the route with the longest prefix_length that matches the
     //! datagram's destination address.
     void route_one_datagram(InternetDatagram &dgram);
+
+    //! the router table
+    std::list<RouteEntry> _router_list{};
+
+    bool _is_match(uint32_t ip, uint32_t refer_ip, uint8_t prefix_length);
 
   public:
     //! Add an interface to the router

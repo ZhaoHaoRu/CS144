@@ -8,6 +8,7 @@
 
 #include <optional>
 
+
 //! \brief The "receiver" part of a TCP implementation.
 
 //! Receives and reassembles segments into a ByteStream, and computes
@@ -19,6 +20,21 @@ class TCPReceiver {
 
     //! The maximum number of bytes we'll store.
     size_t _capacity;
+
+    //! initial sequence number
+    uint32_t _init_seq_number = 0;
+
+    //! is the first-arriving segment that has the SYN flag
+    bool _has_SYN_before = false;
+
+    bool _has_FIN_before = false;
+
+    //! record the abs_seqno
+    uint64_t abs_seqno = 0;
+
+    //! record the window has read
+    uint64_t _base = 0;
+
 
   public:
     //! \brief Construct a TCP receiver

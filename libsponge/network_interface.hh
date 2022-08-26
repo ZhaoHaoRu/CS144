@@ -4,9 +4,12 @@
 #include "ethernet_frame.hh"
 #include "tcp_over_ip.hh"
 #include "tun.hh"
+#include "buffer.hh"
 
 #include <optional>
 #include <queue>
+#include <list>
+#include <unordered_map>
 
 //! \brief A "network interface" that connects IP (the internet layer, or network layer)
 //! with Ethernet (the network access layer, or link layer).
@@ -29,16 +32,50 @@
 //! the network interface passes it up the stack. If it's an ARP
 //! request or reply, the network interface processes the frame
 //! and learns or replies as necessary.
+struct ARP {
+  EthernetAddress _mac;
+  size_t _ttl;
+
+  // The default expiration time of ARP is 30s
+  // ARP(EthernetAddress initAddress, size_t initTTL):_mac(initAddress), _ttl(initTTL) {}
+};
+
+struct WaitingFrame {
+  Address _ip;
+  InternetDatagram _datagram;
+
+  WaitingFrame(Address ip, InternetDatagram datagram): _ip(ip), _datagram(datagram) {}
+};
+
 class NetworkInterface {
   private:
     //! Ethernet (known as hardware, network-access-layer, or link-layer) address of the interface
     EthernetAddress _ethernet_address;
+
+    //! the ARP table: key:ip, value:ARP 
+    std::unordered_map<uint32_t, ARP> _ARP_table{};
+
+    //! the ip waiting to find and the time passed accordingly
+    std::unordered_map<uint32_t, size_t> _waiting_ip_and_time{};
+
+    //! transition expire time
+    size_t _expire_time{5 * 1000};
+
+    //! ARP expire time
+    size_t _ARP_expire_time{30 * 1000};
+
+    //! the waiting queue
+    std::list<WaitingFrame> _frames_waiting{};
 
     //! IP (known as internet-layer or network-layer) address of the interface
     Address _ip_address;
 
     //! outbound queue of Ethernet frames that the NetworkInterface wants sent
     std::queue<EthernetFrame> _frames_out{};
+
+    //! the timer
+    size_t _timer{0};
+
 
   public:
     //! \brief Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer) addresses

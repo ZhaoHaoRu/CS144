@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <exception>
 #include <optional>
+#include <iostream>
 #include <sstream>
 
 struct TCPExpectation : public TCPTestStep {

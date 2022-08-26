@@ -20,7 +20,7 @@ int main() {
         // test #1: start in TIME_WAIT, timeout
         {
             TCPTestHarness test_1 = TCPTestHarness::in_time_wait(cfg);
-
+           
             test_1.execute(Tick(10 * cfg.rt_timeout - 1));
 
             test_1.execute(ExpectState{State::TIME_WAIT});

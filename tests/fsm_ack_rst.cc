@@ -131,14 +131,23 @@ int main() {
         // test 3: ACKs in LISTEN
         cerr << "Test 3" << endl;
         ack_listen_test(cfg, base_seq, base_seq, __LINE__);
+        cerr << "pass 1" << endl;
         ack_listen_test(cfg, base_seq - 1, base_seq, __LINE__);
+        cerr << "pass 2" << endl;
         ack_listen_test(cfg, base_seq, base_seq - 1, __LINE__);
+        cerr << "pass 3" << endl;
         ack_listen_test(cfg, base_seq - 1, base_seq, __LINE__);
+        cerr << "pass 4" << endl;
         ack_listen_test(cfg, base_seq - 1, base_seq - 1, __LINE__);
+        cerr << "pass 5" << endl;
         ack_listen_test(cfg, base_seq + cfg.recv_capacity, base_seq, __LINE__);
+        cerr << "pass 6" << endl;
         ack_listen_test(cfg, base_seq, base_seq + cfg.recv_capacity, __LINE__);
+        cerr << "pass 7" << endl;
         ack_listen_test(cfg, base_seq + cfg.recv_capacity, base_seq, __LINE__);
+        cerr << "pass 8" << endl;
         ack_listen_test(cfg, base_seq + cfg.recv_capacity, base_seq + cfg.recv_capacity, __LINE__);
+        cerr << "pass 9" << endl;
 
         // test 4: ACK and RST in SYN_SENT
         {
@@ -146,6 +155,7 @@ int main() {
             TCPTestHarness test_4 = TCPTestHarness::in_syn_sent(cfg, base_seq);
 
             // data segments with acceptable ACKs should be ignored
+            cerr << "data segments with acceptable ACKs should be ignored" << endl;
             test_4.send_byte(base_seq, base_seq + 1, 1);
 
             test_4.execute(ExpectState{State::SYN_SENT});
@@ -153,6 +163,7 @@ int main() {
             test_4.execute(ExpectNoSegment{}, "test 4 failed: bytes were not ignored in SYN_SENT");
 
             // RST segments without ACKs should be ignored
+            cerr << "RST segments without ACKs should be ignored" << endl;
             test_4.send_rst(base_seq);
             test_4.send_rst(base_seq + 1);
             test_4.send_rst(base_seq - 1);
@@ -161,6 +172,7 @@ int main() {
             test_4.execute(ExpectNoSegment{}, "test 4 failed: RST without ACK was not ignored in SYN_SENT");
 
             // good ACK with RST should result in a RESET but no RST segment sent
+            cerr << "good ACK with RST should result in a RESET but no RST segment sent" << endl;
             test_4.send_rst(base_seq, base_seq + 1);
 
             test_4.execute(ExpectState{State::RESET});

@@ -75,8 +75,8 @@ int main() {
         // Many (arrive/read)s
         {
             TCPReceiverTestHarness test{4000};
-            uint32_t max_block_size = 10;
-            uint32_t n_rounds = 10000;
+            uint32_t max_block_size = 100;
+            uint32_t n_rounds = 1000;
             uint32_t isn = 893472;
             size_t bytes_sent = 0;
             test.execute(SegmentArrives{}.with_syn().with_seqno(isn).with_result(SegmentArrives::Result::OK));

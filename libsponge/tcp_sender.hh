@@ -7,6 +7,7 @@
 #include "wrapping_integers.hh"
 
 #include <functional>
+#include <algorithm>
 #include <queue>
 
 //! \brief The "sender" part of a TCP implementation.
@@ -31,6 +32,37 @@ class TCPSender {
 
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
+
+    //! the sequence number that has been acknowledgment
+    uint64_t _ack_seqno{0};
+
+
+    //! RTO
+    unsigned int _retransmission_timeout;
+
+    //! whether the alarm be started
+    bool _alarm_started = false;
+
+    //! the retransmission timer
+    unsigned int _retransmission_timer{0};
+
+    //! the number of consecutive retransmissions
+    unsigned int _consecutive_retransmission{0};
+
+    //! the outstanding segments
+    std::queue<TCPSegment> _segments_outstanding{};
+
+    //! syn
+    bool _has_syn_before = false;
+
+    //! fin
+    bool _has_fin_before = false;
+
+    //! the window size
+    uint16_t _window_size{0};
+
+    //! How many sequence numbers are occupied by segments sent but not yet acknowledged
+    size_t _bytes_in_flight{0};
 
   public:
     //! Initialize a TCPSender
@@ -87,6 +119,9 @@ class TCPSender {
     //! \brief relative seqno for the next byte to be sent
     WrappingInt32 next_seqno() const { return wrap(_next_seqno, _isn); }
     //!@}
+
+    //! \brief send the TCPsegment seg to the TCP_receiver
+    void send_segment(TCPSegment &seg);
 };
 
 #endif  // SPONGE_LIBSPONGE_TCP_SENDER_HH
